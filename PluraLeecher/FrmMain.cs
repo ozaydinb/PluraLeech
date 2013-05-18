@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
+using Fizzler.Systems.HtmlAgilityPack;
 using PluraLeecher.MVP;
+using PluraLeecher.Models;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace PluraLeecher
 {
@@ -19,7 +23,11 @@ namespace PluraLeecher
         {
             get { return this.browser; }
         }
-        public BindingList<Video> VideoTitleList { get; set; } 
+        public BindingList<Video> VideoTitleList { get; set; }
+        public void ShowMessage(string message)
+        {
+            MessageBox.Show(message);
+        }
 
         private void FormLoad(object sender, EventArgs e)
         {
@@ -34,9 +42,17 @@ namespace PluraLeecher
 
         private void LeechButtonClick(object sender, EventArgs e)
         {
-            _presenter.StartLeech();
+            _presenter.DownloadSelectedPageVideos();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _presenter.DownThemAll();
+
         }
 
     }
+
+
 
 }

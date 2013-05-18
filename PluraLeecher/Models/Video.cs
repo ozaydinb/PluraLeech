@@ -1,4 +1,4 @@
-﻿namespace PluraLeecher
+﻿namespace PluraLeecher.Models
 {
     public class Video: IFile
     {

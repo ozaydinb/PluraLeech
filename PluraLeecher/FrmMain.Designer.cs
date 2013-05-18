@@ -31,6 +31,7 @@
             this.browser = new System.Windows.Forms.WebBrowser();
             this.lstVideoTitle = new System.Windows.Forms.ListBox();
             this.btnLeech = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // browser
@@ -64,11 +65,22 @@
             this.btnLeech.UseVisualStyleBackColor = true;
             this.btnLeech.Click += new System.EventHandler(this.LeechButtonClick);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(93, 9);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(129, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "Down Them All!";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(954, 440);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnLeech);
             this.Controls.Add(this.lstVideoTitle);
             this.Controls.Add(this.browser);
@@ -85,6 +97,7 @@
         private System.Windows.Forms.WebBrowser browser;
         private System.Windows.Forms.ListBox lstVideoTitle;
         private System.Windows.Forms.Button btnLeech;
+        private System.Windows.Forms.Button button1;
     }
 }
 

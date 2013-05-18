@@ -6,7 +6,7 @@ using System.Net;
 
 namespace PluraLeecher
 {
-    public class FileDownloader
+    public class DownloadHelper
     {
         public delegate void DownloadComplate();
         public event DownloadComplate OnComplate;

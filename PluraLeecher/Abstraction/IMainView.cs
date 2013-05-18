@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using PluraLeecher.Models;
 
 namespace PluraLeecher.MVP
 {
@@ -12,6 +13,7 @@ namespace PluraLeecher.MVP
     {
         WebBrowser WebBrowser { get; }
         BindingList<Video> VideoTitleList { get; set; }
-        
+
+        void ShowMessage(string toString);
     }
 }
