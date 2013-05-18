@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,10 +11,7 @@ namespace PluraLeecher.MVP
     public interface IMainView
     {
         WebBrowser WebBrowser { get; }
-        List<string> RequestList { get; }
-        void AddRequest(string requestAddress);
-        void ClearVideoTitleList();
-        void AddVideoTitle(Video video);
+        BindingList<Video> VideoTitleList { get; set; }
         
     }
 }

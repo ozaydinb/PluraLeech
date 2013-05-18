@@ -1,25 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Fiddler;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
 
 namespace PluraLeecher.MVP
 {
-    public class FrmMainPresenter
+    public class MainPresenter
     {
         private readonly IMainView _view;
         private readonly List<Video> _videoList;
         private readonly FileDownloader _fileDownloader;
         private int _currentVideoIndex;
 
-        public FrmMainPresenter(IMainView view)
+        public MainPresenter(IMainView view)
         {
             _view = view;
             _videoList = new List<Video>();
@@ -35,22 +34,15 @@ namespace PluraLeecher.MVP
 
         public void Init()
         {
+            _view.VideoTitleList = new BindingList<Video>();
             FiddlerApplication.BeforeRequest += FiddlerApplicationBeforeRequest;
             CONFIG.IgnoreServerCertErrors = false;
             FiddlerApplication.Startup(80, true, true);
-            _view.WebBrowser.DocumentCompleted += BrowserDocumentCompleted;
-            _view.WebBrowser.Navigate(Strings.WebBrowserStartAddress);
+            _view.WebBrowser.Navigate(ConfigurationManager.AppSettings.Get("StartupUrl"));
+        }
 
-        }
-        private void BrowserDocumentCompleted(object o,WebBrowserDocumentCompletedEventArgs args)
-        {
-            
-        }
         private void FiddlerApplicationBeforeRequest(Session oSession)
         {
-            //lstRequest.Invoke(new UpdateUI(() => lstRequest.Items.Add(oSession.url)));
-            //_view.RequestList.Add(oSession.url);
-            _view.AddRequest(oSession.url);
             if (oSession.url.EndsWith(".mp4") || oSession.url.EndsWith(".avi")
                     || oSession.url.EndsWith("wmv"))
             {
@@ -62,11 +54,11 @@ namespace PluraLeecher.MVP
                 _fileDownloader.DownloadFile(_videoList[_currentVideoIndex]);
             }
         }
+
         public void StartLeech()
         {
-            
-            _view.ClearVideoTitleList();
-            var html = new HtmlAgilityPack.HtmlDocument();
+            _view.VideoTitleList.Clear();
+            var html = new HtmlDocument();
             html.LoadHtml(_view.WebBrowser.DocumentText);
             var document = html.DocumentNode;
             var selectorResult = document.QuerySelectorAll(Strings.Selectors.LinkSelector);
@@ -81,21 +73,17 @@ namespace PluraLeecher.MVP
                 video.PageUrl = string.Format("{0}{1}", urlPrefix, pageUrl);
                 video.Name = string.Format("{0}-{1}", videoCount, Regex.Match(raw, @">([^<]*)").Value.Substring(1));
                 video.FolderName = folderName;
-                _view.AddVideoTitle(video);
+                _view.VideoTitleList.Add(video);
                 _videoList.Add(video);
                 videoCount++;
             }
             _currentVideoIndex = 0;
             _view.WebBrowser.Navigate(_videoList[0].PageUrl);
         }
+
         public void OnClosing()
         {
             FiddlerApplication.Shutdown();
-        }
-
-        public void NavigateBrowser(string url)
-        {
-            _view.WebBrowser.Navigate(url);
         }
     }
 }
