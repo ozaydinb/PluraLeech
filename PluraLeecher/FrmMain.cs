@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Windows.Forms;
-using Fizzler.Systems.HtmlAgilityPack;
-using PluraLeecher.MVP;
+using PluraLeecher.Abstraction;
 using PluraLeecher.Models;
-using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace PluraLeecher
 {
@@ -23,7 +19,9 @@ namespace PluraLeecher
         {
             get { return this.browser; }
         }
+
         public BindingList<Video> VideoTitleList { get; set; }
+        
         public void ShowMessage(string message)
         {
             MessageBox.Show(message);
@@ -48,7 +46,6 @@ namespace PluraLeecher
         private void button1_Click(object sender, EventArgs e)
         {
             _presenter.DownThemAll();
-
         }
 
     }

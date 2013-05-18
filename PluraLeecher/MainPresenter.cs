@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Windows.Forms;
-using System.Xml;
-using System.Xml.Serialization;
 using Fiddler;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
+using PluraLeecher.Abstraction;
+using PluraLeecher.Helpers;
 using PluraLeecher.Models;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
-namespace PluraLeecher.MVP
+namespace PluraLeecher
 {
     public class MainPresenter
     {

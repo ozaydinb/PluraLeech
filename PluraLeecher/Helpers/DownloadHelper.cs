@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Net;
 
-namespace PluraLeecher
+namespace PluraLeecher.Helpers
 {
     public class DownloadHelper
     {

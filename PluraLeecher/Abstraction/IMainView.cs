@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 using PluraLeecher.Models;
 
-namespace PluraLeecher.MVP
+namespace PluraLeecher.Abstraction
 {
     public interface IMainView
     {
