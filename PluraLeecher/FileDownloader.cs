@@ -11,7 +11,7 @@ namespace PluraLeecher
         public delegate void DownloadComplate();
         public event DownloadComplate OnComplate;
         private string _rootPath;
-        public string RootPath
+        private string RootPath
         {
             get
             {
@@ -22,13 +22,7 @@ namespace PluraLeecher
                 return _rootPath;
             }
         }
-        public void DownloadFile(List<IFile> files)
-        {
-            foreach (IFile file in files)
-            {
-                DownloadFile(file);
-            }
-        }
+
         public void DownloadFile(IFile file)
         {
 

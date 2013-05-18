@@ -1,117 +1,83 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using Fiddler;
-using Fizzler.Systems.HtmlAgilityPack;
-using HtmlAgilityPack;
+using PluraLeecher.MVP;
 
 namespace PluraLeecher
 {
-    public partial class FrmMain : Form
+    public partial class FrmMain : Form, IMainView
     {
-        delegate void UpdateUI();
-
-        private delegate void UpdateDownloadStatus();
-
-        public int CurrentVideoIndex;
-        public List<Video> VideoList;
-        public FileDownloader Downloader;
+        private readonly FrmMainPresenter _presenter;
         public FrmMain()
         {
             InitializeComponent();
-            VideoList = new List<Video>();
-            Downloader = new FileDownloader();
-            Downloader.OnComplate += _downloader_OnComplate;
+            _presenter = new FrmMainPresenter(this);
         }
 
-        void _downloader_OnComplate()
+        delegate void UpdateUI();
+
+        public WebBrowser WebBrowser
         {
-            CurrentVideoIndex++;
-            webBrowser1.Navigate(VideoList[CurrentVideoIndex].PageUrl);
+            get { return this.browser; }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private List<string> _requestList;
+        public List<string> RequestList
         {
-            FiddlerApplication.BeforeRequest += FiddlerApplication_BeforeRequest;
-
-            CONFIG.IgnoreServerCertErrors = false;
-            FiddlerApplication.Startup(80, true, true);
-            webBrowser1.DocumentCompleted += webBrowser1_DocumentCompleted;
-            webBrowser1.Navigate(Strings.WebBrowserStartAddress);
-
-            button3.Enabled = false;
-        }
-
-        void FiddlerApplication_BeforeRequest(Session oSession)
-        {
-
-            lstRequest.Invoke(new UpdateUI(() => lstRequest.Items.Add(oSession.url)));
-
-            if (oSession.url.EndsWith(".mp4") || oSession.url.EndsWith(".avi")
-                    || oSession.url.EndsWith("wmv"))
+            get
             {
-                if (!String.IsNullOrEmpty(VideoList[CurrentVideoIndex].DownloadUrl))
-                    return;
-                webBrowser1.Stop();
-                VideoList[CurrentVideoIndex].DownloadUrl = "http://" + oSession.url;
-                VideoList[CurrentVideoIndex].FileExtension = Path.GetExtension(oSession.url).Substring(1);
-                Downloader.DownloadFile(VideoList[CurrentVideoIndex]);
+                _requestList = new List<string>();
+                foreach (string item in lstRequest.Items)
+                {
+                    _requestList.Add(item);
+                }
+                return _requestList;
             }
         }
 
-
-        void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
+        public void AddRequest(string requestAddress)
         {
-            button3.Enabled = true;
+            lstRequest.Invoke(new UpdateUI(() => lstRequest.Items.Add(requestAddress)));
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        public void ClearVideoTitleList()
+        {
+            lstVideoTitle.Items.Clear();
+        }
+
+        public void AddVideoTitle(Video video)
+        {
+            lstVideoTitle.Items.Add(video);
+        }
+
+        private void FormLoad(object sender, EventArgs e)
+        {
+            _presenter.Init();
+        }
+
+        private void ButtonClearClick(object sender, EventArgs e)
         {
             lstRequest.Items.Clear();
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void Form1Closing(object sender, FormClosingEventArgs e)
         {
-            FiddlerApplication.Shutdown();
+            _presenter.OnClosing();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void LeechButtonClick(object sender, EventArgs e)
         {
-            listBox1.Items.Clear();
-            var html = new HtmlAgilityPack.HtmlDocument();
-            html.LoadHtml(webBrowser1.DocumentText);
-            var document = html.DocumentNode;
-            var selectorResult = document.QuerySelectorAll(Strings.Selectors.LinkSelector);
-            var folderName = document.QuerySelectorAll(Strings.Selectors.HeaderSelector).FirstOrDefault().InnerHtml;
-            string urlPrefix = Strings.UrlPrefix;
-            int videoCount = 1;
-            foreach (HtmlNode htmlNode in selectorResult)
-            {
-                string raw = htmlNode.InnerHtml.Substring(htmlNode.InnerHtml.IndexOf("LaunchSelectedPlayer") + 20);
-                var video = new Video();
-                var pageUrl = Regex.Match(raw, @"'([^']*)").Value.Substring(1).Replace("amp;", "");
-                video.PageUrl = string.Format("{0}{1}", urlPrefix, pageUrl);
-                video.Name = string.Format("{0}-{1}", videoCount, Regex.Match(raw, @">([^<]*)").Value.Substring(1));
-                video.FolderName = folderName;
-                listBox1.Items.Add(video);
-                VideoList.Add(video);
-                videoCount++;
-            }
-            CurrentVideoIndex = 0;
-            webBrowser1.Navigate(VideoList[0].PageUrl);
+            _presenter.StartLeech();
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void ButtonNavigateBrowserClick(object sender, EventArgs e)
         {
-            webBrowser1.Navigate(textBox1.Text);
+            _presenter.NavigateBrowser(txtUrl.Text);
         }
 
-        private void listBox2_Click(object sender, EventArgs e)
+        private void LstRequestClick(object sender, EventArgs e)
         {
-            textBox1.Text = lstRequest.SelectedItem.ToString();
+            txtUrl.Text = lstRequest.SelectedItem.ToString();
         }
 
     }
