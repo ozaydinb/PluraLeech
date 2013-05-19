@@ -6,5 +6,9 @@
         {
             return value.Replace(":", " ").Replace("?", "").Replace(",", "");
         }
+        public static string RemoveSlashAndBackSlash(this string value)
+        {
+            return value.Replace(@"\", "-").Replace(@"/", "-");
+        }
     }
 }

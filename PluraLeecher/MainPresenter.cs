@@ -74,6 +74,10 @@ namespace PluraLeecher
         {
             _view.VideoTitleList.Clear();
             _videoList.AddRange(GetVideoList());
+            foreach (Video video in _videoList)
+            {
+                _view.VideoTitleList.Add(video);
+            }
             _currentVideoIndex = 0;
             _view.WebBrowser.Navigate(_videoList[0].PageUrl);
         }
@@ -104,8 +108,8 @@ namespace PluraLeecher
                 }
             }
             _currentCourse = _categories[_categoryIndex].CourseList[_courseIndex];
-            _currentCourse.FolderName = string.Format(@"{0}\{1}", _categories[_categoryIndex].Name,
-                                                      _currentCourse.Name);
+            _currentCourse.FolderName = string.Format(@"{0}\{1}", _categories[_categoryIndex].Name.RemoveSlashAndBackSlash(),
+                                                      _currentCourse.Name.RemoveSlashAndBackSlash());
             _view.WebBrowser.Navigate(_categories[_categoryIndex].CourseList[_courseIndex].Url);
             _courseIndex++;
 
@@ -129,18 +133,26 @@ namespace PluraLeecher
             var videoList = new List<Video>();
             foreach (HtmlNode htmlNode in selectorResult)
             {
-                var video = new Video();
-                var pageUrl =
-                    Regex.Match(htmlNode.QuerySelector("a").Attributes["onclick"].Value, @"'([^']*)")
-                         .Value.Substring(1)
-                         .Replace("amp;","");
-                var videoName = htmlNode.QuerySelector("a").InnerText;
-                video.PageUrl = string.Format("{0}{1}", Strings.UrlPrefix, pageUrl);
-                video.Name = string.Format("{0}-{1}", videoCount, videoName);
-                video.FolderName = folderName;
-                _view.VideoTitleList.Add(video);
-                videoList.Add(video);
-                videoCount++;
+                try
+                {
+                    var video = new Video();
+                    var pageUrl =
+                        Regex.Match(htmlNode.QuerySelector("a").Attributes["onclick"].Value, @"'([^']*)")
+                             .Value.Substring(1)
+                             .Replace("amp;", "");
+                    var videoName = htmlNode.QuerySelector("a").InnerText.RemoveSlashAndBackSlash();
+                    video.PageUrl = string.Format("{0}{1}", Strings.UrlPrefix, pageUrl);
+                    video.Name = string.Format("{0}-{1}", videoCount, videoName);
+                    video.FolderName = folderName;
+                    videoList.Add(video);
+                    videoCount++;
+                }
+                catch (Exception exp)
+                {
+
+                    videoCount++;
+                }
+               
             }
             return videoList;
         }
