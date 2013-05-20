@@ -45,7 +45,7 @@ namespace PluraLeecher
             _view.VideoTitleList = new BindingList<Video>();
             FiddlerApplication.BeforeRequest += FiddlerApplicationBeforeRequest;
             CONFIG.IgnoreServerCertErrors = false;
-            FiddlerApplication.Startup(80, true, true);
+            FiddlerApplication.Startup(0, true, true);
             _view.WebBrowser.Navigate(ConfigurationManager.AppSettings.Get("StartupUrl"));
         }
 
