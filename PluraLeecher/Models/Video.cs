@@ -1,5 +1,8 @@
-﻿namespace PluraLeecher.Models
+﻿using System;
+
+namespace PluraLeecher.Models
 {
+    [Serializable]
     public class Video: IFile
     {
         public string PageUrl { get; set; }

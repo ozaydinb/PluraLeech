@@ -73,6 +73,7 @@
       <DependentUpon>FrmMain.cs</DependentUpon>
     </Compile>
     <Compile Include="Abstraction\IFile.cs" />
+    <Compile Include="Helpers\SerializerHelper.cs" />
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\CourseCategory.cs" />
     <Compile Include="MainPresenter.cs" />

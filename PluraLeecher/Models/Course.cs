@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace PluraLeecher.Models
 {
+    [Serializable]
     public class Course
     {
         public string Url { get; set; }

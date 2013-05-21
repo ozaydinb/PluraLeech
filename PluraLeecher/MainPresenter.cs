@@ -5,6 +5,7 @@ using System.Configuration;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Xml.Serialization;
 using Fiddler;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
@@ -18,19 +19,33 @@ namespace PluraLeecher
     public class MainPresenter
     {
         private readonly IMainView _view;
-        private readonly List<Video> _videoList;
+        private List<Video> _videoList;
         private readonly DownloadHelper _downloadHelper;
         private int _currentVideoIndex;
         private int _categoryIndex = 0;
         private int _courseIndex = 0;
         private Course _currentCourse;
         private List<CourseCategory> _categories;
+        private SerializerHelper _serializerHelper;
+        private string _rootPath;
+        public string RootPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_rootPath))
+                {
+                    _rootPath = ConfigurationManager.AppSettings.Get(Strings.AppConfig.Path);
+                }
+                return _rootPath;
+            }
+        }
 
         public MainPresenter(IMainView view)
         {
             _view = view;
             _videoList = new List<Video>();
             _downloadHelper = new DownloadHelper();
+            _serializerHelper = new SerializerHelper();
             _downloadHelper.OnComplate += DownloadHelperOnComplate;
         }
 
@@ -42,13 +57,21 @@ namespace PluraLeecher
 
         public void Init()
         {
+           
             _view.VideoTitleList = new BindingList<Video>();
             FiddlerApplication.BeforeRequest += FiddlerApplicationBeforeRequest;
             CONFIG.IgnoreServerCertErrors = false;
             FiddlerApplication.Startup(0, true, true);
+            var resumeVideos = _serializerHelper.DeserializeFromFile<List<Video>>();
+            if (resumeVideos != null)
+            {
+                _videoList = resumeVideos;
+                _view.WebBrowser.Navigate(_videoList[0].PageUrl);
+                return;
+            }
             _view.WebBrowser.Navigate(ConfigurationManager.AppSettings.Get("StartupUrl"));
         }
-
+      
         private void FiddlerApplicationBeforeRequest(Session oSession)
         {
             if (oSession.url.EndsWith(".mp4") || oSession.url.EndsWith(".avi")
@@ -104,6 +127,9 @@ namespace PluraLeecher
                     _currentCourse = null;
                     _currentVideoIndex = 0;
                     _view.WebBrowser.Navigate(_videoList[0].PageUrl);
+                    var serializer = new SerializerHelper();
+                    serializer.SerializeToFile(_videoList);
+
                     return;
                 }
             }
@@ -112,8 +138,6 @@ namespace PluraLeecher
                                                       _currentCourse.Name.RemoveSlashAndBackSlash());
             _view.WebBrowser.Navigate(_categories[_categoryIndex].CourseList[_courseIndex].Url);
             _courseIndex++;
-
-
         }
 
         private List<Video> GetVideoList()
@@ -152,7 +176,7 @@ namespace PluraLeecher
 
                     videoCount++;
                 }
-               
+
             }
             return videoList;
         }

@@ -1,4 +1,6 @@
-﻿namespace PluraLeecher
+﻿using System.Configuration;
+
+namespace PluraLeecher
 {
     public struct Strings
     {
