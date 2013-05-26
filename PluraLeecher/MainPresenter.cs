@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Xml.Serialization;
 using Fiddler;
 using Fizzler.Systems.HtmlAgilityPack;
 using HtmlAgilityPack;
@@ -26,20 +26,8 @@ namespace PluraLeecher
         private int _courseIndex = 0;
         private Course _currentCourse;
         private List<CourseCategory> _categories;
-        private SerializerHelper _serializerHelper;
-        private string _rootPath;
-        public string RootPath
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_rootPath))
-                {
-                    _rootPath = ConfigurationManager.AppSettings.Get(Strings.AppConfig.Path);
-                }
-                return _rootPath;
-            }
-        }
-
+        private readonly SerializerHelper _serializerHelper;
+       
         public MainPresenter(IMainView view)
         {
             _view = view;
@@ -51,6 +39,8 @@ namespace PluraLeecher
 
         private void DownloadHelperOnComplate()
         {
+            _videoList[_currentVideoIndex].IsComplated = true;
+            _serializerHelper.SerializeToFile(_videoList);
             _currentVideoIndex++;
             _view.WebBrowser.Navigate(_videoList[_currentVideoIndex].PageUrl);
         }
@@ -59,14 +49,17 @@ namespace PluraLeecher
         {
            
             _view.VideoTitleList = new BindingList<Video>();
+            _view.WebBrowser.ScriptErrorsSuppressed = true;
             FiddlerApplication.BeforeRequest += FiddlerApplicationBeforeRequest;
             CONFIG.IgnoreServerCertErrors = false;
             FiddlerApplication.Startup(0, true, true);
             var resumeVideos = _serializerHelper.DeserializeFromFile<List<Video>>();
             if (resumeVideos != null)
             {
+                var currentVideoIndex = resumeVideos.Count(video => video.IsComplated);
+                _currentVideoIndex = currentVideoIndex;
                 _videoList = resumeVideos;
-                _view.WebBrowser.Navigate(_videoList[0].PageUrl);
+                _view.WebBrowser.Navigate(_videoList[_currentVideoIndex].PageUrl);
                 return;
             }
             _view.WebBrowser.Navigate(ConfigurationManager.AppSettings.Get("StartupUrl"));
@@ -147,7 +140,12 @@ namespace PluraLeecher
             html.LoadHtml(_view.WebBrowser.DocumentText);
             var document = html.DocumentNode;
             var selectorResult = document.QuerySelectorAll(Strings.Selectors.LinkSelector);
-            var folderName = document.QuerySelector(Strings.Selectors.HeaderSelector).InnerHtml;
+            string folderName = "";
+            var folderNameNode = document.QuerySelector(Strings.Selectors.HeaderSelector);
+            if (folderNameNode != null)
+            {
+                folderName = folderNameNode.InnerText;
+            }
             if (_currentCourse != null)
             {
                 folderName = _currentCourse.FolderName;

@@ -28,17 +28,18 @@ namespace PluraLeecher.Helpers
             using (var client = new WebClient())
             {
                 var url = new Uri(file.DownloadUrl);
-                var filePath = string.Format(@"{0}\{1}\{2}.{3}", RootPath, file.FolderName.DeleteIllegalCharacters(), file.Name.DeleteIllegalCharacters().Replace(@"\",""), file.FileExtension);
-                var directoryPath = String.Format(@"{0}\{1}", RootPath, file.FolderName);
+                var filePath = string.Format(@"{0}\{1}\{2}.{3}", RootPath, file.FolderName.DeleteIllegalCharacters(), file.Name.DeleteIllegalCharacters().RemoveSlashAndBackSlash(), file.FileExtension);
+                var directoryPath = String.Format(@"{0}\{1}", RootPath, file.FolderName.DeleteIllegalCharacters());
 
                 if (!Directory.Exists(directoryPath))
                 {
                     Directory.CreateDirectory(directoryPath);
                 }
-                if (!File.Exists(filePath))
+                if (File.Exists(filePath))
                 {
-                    client.DownloadFile(url, filePath);
+                    File.Delete(filePath);
                 }
+                client.DownloadFile(url, filePath);
                 OnComplate();
             }
         }
