@@ -22,6 +22,7 @@ namespace PluraLeecher
 
         public BindingList<Video> VideoTitleList { get; set; }
         
+        
         public void ShowMessage(string message)
         {
             MessageBox.Show(message);
@@ -46,6 +47,11 @@ namespace PluraLeecher
         private void button1_Click(object sender, EventArgs e)
         {
             _presenter.DownThemAll();
+        }
+
+        private void lstVideoTitle_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
 
     }
