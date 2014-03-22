@@ -54,6 +54,7 @@
             this.lstVideoTitle.Name = "lstVideoTitle";
             this.lstVideoTitle.Size = new System.Drawing.Size(210, 394);
             this.lstVideoTitle.TabIndex = 1;
+            this.lstVideoTitle.SelectedIndexChanged += new System.EventHandler(this.lstVideoTitle_SelectedIndexChanged);
             // 
             // btnLeech
             // 

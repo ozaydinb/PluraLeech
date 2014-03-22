@@ -133,6 +133,10 @@ namespace PluraLeecher
             _courseIndex++;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         private List<Video> GetVideoList()
         {
             _view.VideoTitleList.Clear();
@@ -158,12 +162,22 @@ namespace PluraLeecher
                 try
                 {
                     var video = new Video();
-                    var pageUrl =
-                        Regex.Match(htmlNode.QuerySelector("a").Attributes["onclick"].Value, @"'([^']*)")
-                             .Value.Substring(1)
-                             .Replace("amp;", "");
+                    // Hata aldığımız yer 
+                    string rawUrl = htmlNode.QuerySelector("a").Attributes["ng-click"].Value;
+                    //TODO Salih: NullReferanceException verebilir! Sonrasında düzeltilebilir.
+                    string baseUrl = Regex.Match(rawUrl,@"'([^']*)").Groups.SyncRoot.ToString().Substring(1);
+                    string extensionUrl = Regex.Match(rawUrl, @"'([^']*)")
+                        .NextMatch()
+                        .NextMatch()
+                        .Groups.SyncRoot.ToString().Substring(1).Replace("amp;","");
+
+                    var pageUrl = baseUrl + @"/Player?" + extensionUrl;
+                             //.Value.Substring(1)
+                             //.Replace("amp;", "");
+                    //var geleniataoyala = match;
                     var videoName = htmlNode.QuerySelector("a").InnerText.RemoveSlashAndBackSlash();
-                    video.PageUrl = string.Format("{0}{1}", Strings.UrlPrefix, pageUrl);
+                    video.PageUrl = pageUrl;
+                    //video.PageUrl = string.Format("{0}{1}", Strings.UrlPrefix, pageUrl);
                     video.Name = string.Format("{0}-{1}", videoCount, videoName);
                     video.FolderName = folderName;
                     videoList.Add(video);
